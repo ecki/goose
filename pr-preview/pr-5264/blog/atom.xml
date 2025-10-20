@@ -182,6 +182,71 @@
         </author>
     </entry>
     <entry>
+        <title type="html"><![CDATA[goose is Celebrating Hacktoberfest 2025!]]></title>
+        <id>https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025</id>
+        <link href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025"/>
+        <updated>2025-09-26T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Explore goose prizes you can earn and contributions you can make during Hacktoberfest 2025]]></summary>
+        <content type="html"><![CDATA[<p><img decoding="async" loading="lazy" alt="blog banner" src="https://block.github.io/goose/pr-preview/pr-5264/assets/images/hacktoberfest2025-49342480747ee95fe69415c0f2de26f2.png" width="1920" height="1080" class="img_ev3q"></p>
+<p>October is around the corner, which means spooky season is upon us, and with that crispy fall air that gives you "goose" bumps...it's finally time for Hacktoberfest 2025! The goose team is beyond excited to celebrate with you all for the first time this year. Let's get into how you can participate, and what prizes you can win. 👀</p>
+<p><a href="https://hacktoberfest.com/participation/" target="_blank" rel="noopener noreferrer">Hacktoberfest</a> is a month-long celebration every October of open source and participating open source projects. It's a great chance to earn fun prizes for contributing to your favorite projects, or a perfect opportunity to get your feet wet in a new project.</p>
+<h1>🎉 How Can I Contribute to goose?</h1>
+<p>In the <a href="https://github.com/block/goose" target="_blank" rel="noopener noreferrer">goose repo</a>, there's something for everyone no matter if you're a newbie or a veteran.</p>
+<p>We've created an official <a href="https://github.com/block/goose/issues/4705" target="_blank" rel="noopener noreferrer">goose Hacktoberfest 2025 Project Hub</a>. This hub will serve as your source of truth for all open <code>hacktoberfest</code> labeled-issues and resources you will need throughout the month. It will be updated every week with new issues as we experience contributions, so make sure to bookmark it!</p>
+<p>From writing blog posts about goose, fixing bugs, or adding new features, our goal is to give contributors of various practices the chance to contribute to goose! Here are all the categories of issues you can expect to make your impact:</p>
+<ul>
+<li>Feature Requests: Add new features to improve the goose experience</li>
+<li>Bug Fixes: Fix key bugs that have been troubling community members</li>
+<li>Platform Support: Add features and support for goose on platforms like Windows</li>
+<li>Documentation: Support goose guides with contributions to its documentation site</li>
+<li>Recipes: Submit your own goose recipes for community members to bookmark &amp; use</li>
+<li>Prompt Library: Submit your top prompts to goose's library of top prompts</li>
+<li>Content Creation: Create blog posts and videos describing goose and its features</li>
+</ul>
+<h1>📝 Your Guide to goose x Hacktoberfest 2025</h1>
+<p>To help you make the most of each of your contributions, below is a quick guide on general rules to follow, important resources, how top contributors are tallied, and more below:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-key-rules">✅ Key Rules<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#-key-rules" class="hash-link" aria-label="Direct link to ✅ Key Rules" title="Direct link to ✅ Key Rules">​</a></h2>
+<ol>
+<li>Read the <a href="https://github.com/block/.github/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener noreferrer">code of conduct</a>.</li>
+<li>Refer to the <a href="https://github.com/block/goose/blob/main/ai-assisted-coding-guide.md" target="_blank" rel="noopener noreferrer">Responsible AI-Assisted Coding Guide</a>, <a href="https://github.com/block/goose/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a> &amp; <a href="https://github.com/block/goose/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for your contributions.</li>
+<li>Choose a task from this project's Hacktoberfest <a href="https://github.com/block/goose/issues/4705" target="_blank" rel="noopener noreferrer">Project Hub</a>. Each issue has the 🏷️ <code>hacktoberfest</code> label.</li>
+<li>Comment ".take" on the corresponding issue to get assigned the task.</li>
+<li>Fork the repository and create a new branch for your work.</li>
+<li>Make your changes and submit a pull request.</li>
+<li>Wait for review and address any feedback.</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-how-to-self-assign-issues">🏷️ How To Self-Assign Issues<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#%EF%B8%8F-how-to-self-assign-issues" class="hash-link" aria-label="Direct link to 🏷️ How To Self-Assign Issues" title="Direct link to 🏷️ How To Self-Assign Issues">​</a></h2>
+<p>All issues available for contributions are in the official project hub mentioned earlier.</p>
+<ol>
+<li>Once you've found an issue that hasn't been claimed, you can pick up any issue labeled <code>hacktoberfest</code> by commenting ".take" to assign yourself the issue. (No stealing from others!)</li>
+<li>Followed any guidance in the issue, along with our AI Assisted and submitted your PR, you can consider your contribution accepted once it has been reviewed, approved, and merged with the label <code>hacktoberfest-accepted</code>.</li>
+</ol>
+<ul>
+<li>If your PR is marked as <code>spam</code>, <code>invalid</code>, or needs more input from you, you need to re-evaluate your contribution. This is to ensure it counts towards Hacktoberfest, and that your PR aligns with the repository's goals.</li>
+<li>Outside of guidelines of a given issue, always make sure your contributions adhere to our code of conduct.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-leaderboard--prizes">🏆 Leaderboard &amp; Prizes<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#-leaderboard--prizes" class="hash-link" aria-label="Direct link to 🏆 Leaderboard &amp; Prizes" title="Direct link to 🏆 Leaderboard &amp; Prizes">​</a></h2>
+<p>Every hacktoberfest PR and contribution will earn you points on our leaderboard. The Top 20 Contributors with the most points by the end of the month will win special prizes! The leaderboard will auto-update with each contribution, so here's a breakdown of how our ranking system works:</p>
+<table><thead><tr><th>Weight</th><th>Points Awarded</th><th>Description</th></tr></thead><tbody><tr><td>🐭 Small</td><td>5 points</td><td>For smaller issues that take limited time to complete and/or don't require any product knowledge.</td></tr><tr><td>🐰 Medium</td><td>10 points</td><td>For average issues that take additional time to complete and/or require some product knowledge.</td></tr><tr><td>🐂 Large</td><td>15 points</td><td>For meaty issues that take a significant amount of time to complete and/or possibly require deep product knowledge.</td></tr></tbody></table>
+<p>As a special thank you, the team is offering exclusive gift cards for the fresh new goose swag shop along with free LLM credits for our Top 20 contributors:</p>
+<p><img decoding="async" loading="lazy" alt="goose swag shop" src="https://block.github.io/goose/pr-preview/pr-5264/assets/images/gooseswag-3c71bcd887807275a9613fcec322b3e6.png" width="1920" height="1080" class="img_ev3q"></p>
+<table><thead><tr><th>Place</th><th>Prize</th></tr></thead><tbody><tr><td>🥇 Top 1-5 Contributors</td><td>$100 gift card to goose swag shop + $100 LLM credits</td></tr><tr><td>🥈 Top 6-10 Contributors</td><td>$50 gift card to goose swag shop + $50 LLM credits</td></tr><tr><td>🥉 Top 11-20 Contributors</td><td>$25 LLM credits</td></tr></tbody></table>
+<p>You can keep an eye on your progress all month long in our Hacktoberfest 2025 Leaderboard here!</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="when-you-need-help">When You Need Help<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#when-you-need-help" class="hash-link" aria-label="Direct link to When You Need Help" title="Direct link to When You Need Help">​</a></h2>
+<p>When in doubt, don't stress! The goose team is here to help you make the most of your contributions. Here's where to go when you have specific questions:</p>
+<ol>
+<li>🆘 Maintainer Help: Connect with the maintainers by commenting on the issue or chat with them directly in the #🎃┃hacktoberfest channel on Discord.</li>
+<li>🫶 Community Support: <a href="https://discord.gg/block-opensource" target="_blank" rel="noopener noreferrer">Join us on Discord</a> to live chat with fellow contributors and get tips for success from participants!</li>
+<li>🎙️ Office Hours: Join us every Tuesday at 1pm Eastern Time on <a href="https://discord.gg/block-opensource" target="_blank" rel="noopener noreferrer">Discord</a> through the month of October to get live-over-voice help with open PRs, questions you may have, and general help. Keep an eye out on the <a href="https://block.github.io/goose/community/" target="_blank" rel="noopener noreferrer">goose events calendar</a> for future events centered around Hacktoberfest!</li>
+</ol>
+<p>Happy hacking and cheers to goose x Hacktoberfest 2025! 🎉</p>
+]]></content>
+        <author>
+            <name>Tania Chakraborty</name>
+            <uri>https://taniachakraborty.com</uri>
+        </author>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[How to Choose Between Subagents and Subrecipes in goose]]></title>
         <id>https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/subagents-vs-subrecipes</id>
         <link href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/subagents-vs-subrecipes"/>
@@ -268,71 +333,6 @@
 ]]></content>
         <author>
             <name>W Ian Douglas</name>
-        </author>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[goose is Celebrating Hacktoberfest 2025!]]></title>
-        <id>https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025</id>
-        <link href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025"/>
-        <updated>2025-09-26T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Explore goose prizes you can earn and contributions you can make during Hacktoberfest 2025]]></summary>
-        <content type="html"><![CDATA[<p><img decoding="async" loading="lazy" alt="blog banner" src="https://block.github.io/goose/pr-preview/pr-5264/assets/images/hacktoberfest2025-49342480747ee95fe69415c0f2de26f2.png" width="1920" height="1080" class="img_ev3q"></p>
-<p>October is around the corner, which means spooky season is upon us, and with that crispy fall air that gives you "goose" bumps...it's finally time for Hacktoberfest 2025! The goose team is beyond excited to celebrate with you all for the first time this year. Let's get into how you can participate, and what prizes you can win. 👀</p>
-<p><a href="https://hacktoberfest.com/participation/" target="_blank" rel="noopener noreferrer">Hacktoberfest</a> is a month-long celebration every October of open source and participating open source projects. It's a great chance to earn fun prizes for contributing to your favorite projects, or a perfect opportunity to get your feet wet in a new project.</p>
-<h1>🎉 How Can I Contribute to goose?</h1>
-<p>In the <a href="https://github.com/block/goose" target="_blank" rel="noopener noreferrer">goose repo</a>, there's something for everyone no matter if you're a newbie or a veteran.</p>
-<p>We've created an official <a href="https://github.com/block/goose/issues/4705" target="_blank" rel="noopener noreferrer">goose Hacktoberfest 2025 Project Hub</a>. This hub will serve as your source of truth for all open <code>hacktoberfest</code> labeled-issues and resources you will need throughout the month. It will be updated every week with new issues as we experience contributions, so make sure to bookmark it!</p>
-<p>From writing blog posts about goose, fixing bugs, or adding new features, our goal is to give contributors of various practices the chance to contribute to goose! Here are all the categories of issues you can expect to make your impact:</p>
-<ul>
-<li>Feature Requests: Add new features to improve the goose experience</li>
-<li>Bug Fixes: Fix key bugs that have been troubling community members</li>
-<li>Platform Support: Add features and support for goose on platforms like Windows</li>
-<li>Documentation: Support goose guides with contributions to its documentation site</li>
-<li>Recipes: Submit your own goose recipes for community members to bookmark &amp; use</li>
-<li>Prompt Library: Submit your top prompts to goose's library of top prompts</li>
-<li>Content Creation: Create blog posts and videos describing goose and its features</li>
-</ul>
-<h1>📝 Your Guide to goose x Hacktoberfest 2025</h1>
-<p>To help you make the most of each of your contributions, below is a quick guide on general rules to follow, important resources, how top contributors are tallied, and more below:</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-key-rules">✅ Key Rules<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#-key-rules" class="hash-link" aria-label="Direct link to ✅ Key Rules" title="Direct link to ✅ Key Rules">​</a></h2>
-<ol>
-<li>Read the <a href="https://github.com/block/.github/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener noreferrer">code of conduct</a>.</li>
-<li>Refer to the <a href="https://github.com/block/goose/blob/main/ai-assisted-coding-guide.md" target="_blank" rel="noopener noreferrer">Responsible AI-Assisted Coding Guide</a>, <a href="https://github.com/block/goose/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a> &amp; <a href="https://github.com/block/goose/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a> for your contributions.</li>
-<li>Choose a task from this project's Hacktoberfest <a href="https://github.com/block/goose/issues/4705" target="_blank" rel="noopener noreferrer">Project Hub</a>. Each issue has the 🏷️ <code>hacktoberfest</code> label.</li>
-<li>Comment ".take" on the corresponding issue to get assigned the task.</li>
-<li>Fork the repository and create a new branch for your work.</li>
-<li>Make your changes and submit a pull request.</li>
-<li>Wait for review and address any feedback.</li>
-</ol>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="️-how-to-self-assign-issues">🏷️ How To Self-Assign Issues<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#%EF%B8%8F-how-to-self-assign-issues" class="hash-link" aria-label="Direct link to 🏷️ How To Self-Assign Issues" title="Direct link to 🏷️ How To Self-Assign Issues">​</a></h2>
-<p>All issues available for contributions are in the official project hub mentioned earlier.</p>
-<ol>
-<li>Once you've found an issue that hasn't been claimed, you can pick up any issue labeled <code>hacktoberfest</code> by commenting ".take" to assign yourself the issue. (No stealing from others!)</li>
-<li>Followed any guidance in the issue, along with our AI Assisted and submitted your PR, you can consider your contribution accepted once it has been reviewed, approved, and merged with the label <code>hacktoberfest-accepted</code>.</li>
-</ol>
-<ul>
-<li>If your PR is marked as <code>spam</code>, <code>invalid</code>, or needs more input from you, you need to re-evaluate your contribution. This is to ensure it counts towards Hacktoberfest, and that your PR aligns with the repository's goals.</li>
-<li>Outside of guidelines of a given issue, always make sure your contributions adhere to our code of conduct.</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="-leaderboard--prizes">🏆 Leaderboard &amp; Prizes<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#-leaderboard--prizes" class="hash-link" aria-label="Direct link to 🏆 Leaderboard &amp; Prizes" title="Direct link to 🏆 Leaderboard &amp; Prizes">​</a></h2>
-<p>Every hacktoberfest PR and contribution will earn you points on our leaderboard. The Top 20 Contributors with the most points by the end of the month will win special prizes! The leaderboard will auto-update with each contribution, so here's a breakdown of how our ranking system works:</p>
-<table><thead><tr><th>Weight</th><th>Points Awarded</th><th>Description</th></tr></thead><tbody><tr><td>🐭 Small</td><td>5 points</td><td>For smaller issues that take limited time to complete and/or don't require any product knowledge.</td></tr><tr><td>🐰 Medium</td><td>10 points</td><td>For average issues that take additional time to complete and/or require some product knowledge.</td></tr><tr><td>🐂 Large</td><td>15 points</td><td>For meaty issues that take a significant amount of time to complete and/or possibly require deep product knowledge.</td></tr></tbody></table>
-<p>As a special thank you, the team is offering exclusive gift cards for the fresh new goose swag shop along with free LLM credits for our Top 20 contributors:</p>
-<p><img decoding="async" loading="lazy" alt="goose swag shop" src="https://block.github.io/goose/pr-preview/pr-5264/assets/images/gooseswag-3c71bcd887807275a9613fcec322b3e6.png" width="1920" height="1080" class="img_ev3q"></p>
-<table><thead><tr><th>Place</th><th>Prize</th></tr></thead><tbody><tr><td>🥇 Top 1-5 Contributors</td><td>$100 gift card to goose swag shop + $100 LLM credits</td></tr><tr><td>🥈 Top 6-10 Contributors</td><td>$50 gift card to goose swag shop + $50 LLM credits</td></tr><tr><td>🥉 Top 11-20 Contributors</td><td>$25 LLM credits</td></tr></tbody></table>
-<p>You can keep an eye on your progress all month long in our Hacktoberfest 2025 Leaderboard here!</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="when-you-need-help">When You Need Help<a href="https://block.github.io/goose/pr-preview/pr-5264/blog/2025/09/26/hacktoberfest-2025#when-you-need-help" class="hash-link" aria-label="Direct link to When You Need Help" title="Direct link to When You Need Help">​</a></h2>
-<p>When in doubt, don't stress! The goose team is here to help you make the most of your contributions. Here's where to go when you have specific questions:</p>
-<ol>
-<li>🆘 Maintainer Help: Connect with the maintainers by commenting on the issue or chat with them directly in the #🎃┃hacktoberfest channel on Discord.</li>
-<li>🫶 Community Support: <a href="https://discord.gg/block-opensource" target="_blank" rel="noopener noreferrer">Join us on Discord</a> to live chat with fellow contributors and get tips for success from participants!</li>
-<li>🎙️ Office Hours: Join us every Tuesday at 1pm Eastern Time on <a href="https://discord.gg/block-opensource" target="_blank" rel="noopener noreferrer">Discord</a> through the month of October to get live-over-voice help with open PRs, questions you may have, and general help. Keep an eye out on the <a href="https://block.github.io/goose/community/" target="_blank" rel="noopener noreferrer">goose events calendar</a> for future events centered around Hacktoberfest!</li>
-</ol>
-<p>Happy hacking and cheers to goose x Hacktoberfest 2025! 🎉</p>
-]]></content>
-        <author>
-            <name>Tania Chakraborty</name>
-            <uri>https://taniachakraborty.com</uri>
         </author>
     </entry>
     <entry>
