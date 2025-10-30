@@ -1,4 +1,13 @@
-use anyhow::Result;
+//! Gondola provider for ML model inference.
+//!
+//! Unlike other providers in this module that implement the `Provider` trait for generative
+//! LLM interactions (chat completions, streaming), this provider is designed for classification
+//! and inference tasks using BERT-based models. It provides access to Gondola's BatchInfer API
+//! for use cases like prompt injection detection.
+//!
+//! TODO: figure out if this is the right place for this. 
+
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
@@ -57,7 +66,8 @@ impl GondolaProvider {
     pub fn with_endpoint(endpoint: &str) -> Result<Self> {
         let client = reqwest::Client::builder()
             .timeout(Duration::from_secs(30))
-            .build()?;
+            .build()
+            .context("Failed to create HTTP client")?;
 
         Ok(Self {
             endpoint: endpoint.to_string(),
@@ -120,48 +130,29 @@ impl GondolaProvider {
             .header("Content-Type", "application/json")
             .json(&request)
             .send()
-            .await?;
+            .await
+            .context("Failed to send request to Gondola")?;
 
-        if !response.status().is_success() {
-            let status = response.status();
+        let status = response.status();
+        if !status.is_success() {
             let body = response.text().await.unwrap_or_default();
             anyhow::bail!("Gondola request failed with status {}: {}", status, body);
         }
 
-        let response_body = response.text().await?;
+        let response_body = response
+            .text()
+            .await
+            .context("Failed to read response body from Gondola")?;
+
         tracing::debug!(
             response_length = response_body.len(),
             "Received response from Gondola"
         );
 
-        let parsed: BatchInferResponse = serde_json::from_str(&response_body)?;
+        let parsed: BatchInferResponse =
+            serde_json::from_str(&response_body).context("Failed to parse Gondola response")?;
 
         Ok(parsed)
-    }
-
-    /// Convenience method for single text inference
-    // TODO: do we need this???
-    pub async fn infer_single(
-        &self,
-        model: &str,
-        version: &str,
-        input_name: &str,
-        text: &str,
-    ) -> Result<Vec<f64>> {
-        let response = self
-            .batch_infer(model, version, input_name, &[text.to_string()])
-            .await?;
-
-        if response.response_items.is_empty() {
-            anyhow::bail!("Empty response from Gondola");
-        }
-
-        let first_item = &response.response_items[0];
-        if let Some(ref double_list) = first_item.double_list_value {
-            Ok(double_list.double_values.clone())
-        } else {
-            anyhow::bail!("No double_list_value in response");
-        }
     }
 }
 
@@ -279,44 +270,6 @@ mod tests {
         let response = result.unwrap();
         assert_eq!(response.model, "test-model");
         assert_eq!(response.response_items.len(), 1);
-    }
-
-    // TODO: check if necessary
-    #[tokio::test]
-    async fn test_infer_single_with_mock() {
-        use wiremock::matchers::method;
-        use wiremock::{Mock, MockServer, ResponseTemplate};
-
-        let mock_server = MockServer::start().await;
-
-        let response_body = json!({
-            "model": "test-model",
-            "version": "v1",
-            "occurred_at": "123456789",
-            "response_items": [
-                {
-                    "double_list_value": {
-                        "double_values": [-5.0, 8.5]
-                    }
-                }
-            ]
-        });
-
-        Mock::given(method("POST"))
-            .respond_with(ResponseTemplate::new(200).set_body_json(&response_body))
-            .mount(&mock_server)
-            .await;
-
-        let provider = GondolaProvider::with_endpoint(&mock_server.uri()).unwrap();
-        let result = provider
-            .infer_single("test-model", "v1", "text_input", "test text")
-            .await;
-
-        assert!(result.is_ok());
-        let scores = result.unwrap();
-        assert_eq!(scores.len(), 2);
-        assert!((scores[0] - (-5.0)).abs() < 0.0001);
-        assert!((scores[1] - 8.5).abs() < 0.0001);
     }
 
     #[tokio::test]
