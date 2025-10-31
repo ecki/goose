@@ -1,5 +1,5 @@
-pub mod prompt_ml_detector;
 pub mod patterns;
+pub mod prompt_ml_detector;
 pub mod scanner;
 pub mod security_inspector;
 
@@ -67,7 +67,7 @@ impl SecurityManager {
 
         let scanner = self.scanner.get_or_init(|| {
             let ml_enabled = self.is_ml_scanning_enabled();
-            
+
             let scanner = if ml_enabled {
                 match PromptInjectionScanner::with_ml_detection() {
                     Ok(s) => {
@@ -92,7 +92,7 @@ impl SecurityManager {
                 );
                 PromptInjectionScanner::new()
             };
-            
+
             scanner
         });
 
@@ -183,12 +183,6 @@ impl SecurityManager {
             .collect();
 
         self.analyze_tool_requests(&tool_requests, messages).await
-    }
-
-    /// Check if models need to be downloaded and return appropriate user message
-    pub async fn check_model_download_status(&self) -> Option<String> {
-        // Phase 1: No ML models needed, pattern matching is instant
-        None
     }
 }
 

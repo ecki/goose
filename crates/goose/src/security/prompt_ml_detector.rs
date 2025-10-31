@@ -1,5 +1,9 @@
 use crate::providers::gondola::GondolaProvider;
 use anyhow::{Context, Result};
+use std::collections::HashMap;
+
+/// Default model name for prompt injection detection
+pub const DEFAULT_MODEL_NAME: &str = "deberta-prompt-injection-v2";
 
 pub struct MlDetector {
     provider: GondolaProvider,
@@ -12,13 +16,48 @@ pub struct ModelConfig {
     pub input_name: String,
 }
 
-impl Default for ModelConfig {
-    fn default() -> Self {
-        Self {
-            model: "deberta-prompt-injection-v2".to_string(),
-            version: "gmv-zve9abhxe9s7fq1zep5dxd807".to_string(),
-            input_name: "text_input".to_string(),
-        }
+impl ModelConfig {
+    /// Registry of available models with their full configurations
+    fn model_registry() -> HashMap<&'static str, (&'static str, &'static str)> {
+        let mut registry = HashMap::new();
+        registry.insert(
+            "deberta-prompt-injection-v2",
+            ("gmv-zve9abhxe9s7fq1zep5dxd807", "text_input"),
+        );
+        registry
+    }
+
+    pub fn from_model_name(model_name: &str) -> Result<Self> {
+        let registry = Self::model_registry();
+
+        let (version, input_name) = registry.get(model_name).ok_or_else(|| {
+            anyhow::anyhow!(
+                "Unknown model '{}'. Available models: {}",
+                model_name,
+                registry.keys().map(|k| *k).collect::<Vec<_>>().join(", ")
+            )
+        })?;
+
+        Ok(Self {
+            model: model_name.to_string(),
+            version: version.to_string(),
+            input_name: input_name.to_string(),
+        })
+    }
+
+    pub fn default() -> Self {
+        Self::from_model_name(DEFAULT_MODEL_NAME)
+            .expect("Default model should always be in registry")
+    }
+
+    pub fn from_config() -> Result<Self> {
+        let config = crate::config::Config::global();
+
+        let model_name = config
+            .get_param::<String>("security_ml_model")
+            .unwrap_or_else(|_| DEFAULT_MODEL_NAME.to_string());
+
+        Self::from_model_name(&model_name)
     }
 }
 
@@ -30,8 +69,8 @@ impl MlDetector {
     pub fn from_env() -> Result<Self> {
         let provider = GondolaProvider::from_env()
             .context("Failed to initialize Gondola provider for ML detection")?;
-        
-        let config = ModelConfig::default();
+
+        let config = ModelConfig::from_config().context("Failed to load ML model configuration")?;
         Ok(Self::new(provider, config))
     }
 

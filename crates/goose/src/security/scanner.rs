@@ -1,6 +1,6 @@
 use crate::conversation::message::Message;
-use crate::security::prompt_ml_detector::MlDetector;
 use crate::security::patterns::{PatternMatcher, RiskLevel};
+use crate::security::prompt_ml_detector::MlDetector;
 use anyhow::Result;
 use rmcp::model::CallToolRequestParam;
 use serde_json::Value;
@@ -25,7 +25,6 @@ impl PromptInjectionScanner {
         }
     }
 
-    /// Create scanner with ML detection enabled
     pub fn with_ml_detection() -> Result<Self> {
         let ml_detector = MlDetector::from_env()?;
         Ok(Self {
@@ -34,7 +33,6 @@ impl PromptInjectionScanner {
         })
     }
 
-    /// Get threshold from config
     pub fn get_threshold_from_config(&self) -> f32 {
         use crate::config::Config;
         let config = Config::global();
@@ -43,38 +41,22 @@ impl PromptInjectionScanner {
             return threshold as f32;
         }
 
-        0.7 // Default threshold
+        0.7
     }
 
-    /// Analyze tool call with conversation context
-    /// This is the main security analysis method
     pub async fn analyze_tool_call_with_context(
         &self,
         tool_call: &CallToolRequestParam,
         _messages: &[Message],
     ) -> Result<ScanResult> {
-        // For Phase 1, focus on tool call content analysis
-        // Phase 2 will add conversation context analysis
         let tool_content = self.extract_tool_content(tool_call);
         self.scan_for_dangerous_patterns(&tool_content).await
     }
 
-    /// Scan system prompt for injection attacks
-    pub async fn scan_system_prompt(&self, system_prompt: &str) -> Result<ScanResult> {
-        self.scan_for_dangerous_patterns(system_prompt).await
-    }
-
-    /// Scan with prompt injection model (legacy method name for compatibility)
-    pub async fn scan_with_prompt_injection_model(&self, text: &str) -> Result<ScanResult> {
-        self.scan_for_dangerous_patterns(text).await
-    }
-
-    /// Core scanning logic - uses both pattern and ML detection
+    // TODO: see if we can combine this with the above
     pub async fn scan_for_dangerous_patterns(&self, text: &str) -> Result<ScanResult> {
-        // Run pattern-based detection
         let pattern_confidence = self.scan_with_patterns(text);
-        
-        // Run ML-based detection if available
+
         let ml_confidence = if let Some(ml_detector) = &self.ml_detector {
             match ml_detector.scan(text).await {
                 Ok(conf) => Some(conf),
@@ -87,11 +69,8 @@ impl PromptInjectionScanner {
             None
         };
 
-        // Combine results
         self.combine_results(text, pattern_confidence, ml_confidence)
     }
-
-    /// Run pattern-based scanning and return confidence score
     fn scan_with_patterns(&self, text: &str) -> f32 {
         let matches = self.pattern_matcher.scan_text(text);
 
@@ -107,14 +86,12 @@ impl PromptInjectionScanner {
         max_risk.confidence_score()
     }
 
-    /// Combine pattern and ML results into final scan result
     fn combine_results(
         &self,
         text: &str,
         pattern_confidence: f32,
         ml_confidence: Option<f32>,
     ) -> Result<ScanResult> {
-        // Use the maximum confidence from either method
         let confidence = match ml_confidence {
             Some(ml_conf) => pattern_confidence.max(ml_conf),
             None => pattern_confidence,
@@ -122,13 +99,10 @@ impl PromptInjectionScanner {
 
         let is_malicious = confidence >= 0.5;
 
-        // Build explanation
         let explanation = if confidence == 0.0 {
             "No security threats detected".to_string()
         } else {
             let mut parts = Vec::new();
-
-            // Pattern detection details
             if pattern_confidence > 0.0 {
                 let matches = self.pattern_matcher.scan_text(text);
                 let mut pattern_details = Vec::new();
@@ -145,7 +119,7 @@ impl PromptInjectionScanner {
                             .collect::<String>()
                     ));
                 }
-                
+
                 let pattern_summary = if matches.len() > 3 {
                     format!(
                         "Pattern-based detection (confidence: {:.2}):\n{}\n... and {} more",
@@ -163,12 +137,8 @@ impl PromptInjectionScanner {
                 parts.push(pattern_summary);
             }
 
-            // ML detection details
             if let Some(ml_conf) = ml_confidence {
-                parts.push(format!(
-                    "ML-based detection (confidence: {:.2})",
-                    ml_conf
-                ));
+                parts.push(format!("ML-based detection (confidence: {:.2})", ml_conf));
             }
 
             parts.join("\n\n")
@@ -181,23 +151,15 @@ impl PromptInjectionScanner {
         })
     }
 
-    /// Extract relevant content from tool call for analysis
     fn extract_tool_content(&self, tool_call: &CallToolRequestParam) -> String {
         let mut content = Vec::new();
-
-        // Add tool name
         content.push(format!("Tool: {}", tool_call.name));
-
-        // Extract text from arguments
         self.extract_text_from_value(&Value::from(tool_call.arguments.clone()), &mut content, 0);
-
         content.join("\n")
     }
 
-    /// Recursively extract text content from JSON values
     #[allow(clippy::only_used_in_recursion)]
     fn extract_text_from_value(&self, value: &Value, content: &mut Vec<String>, depth: usize) {
-        // Prevent infinite recursion
         if depth > 10 {
             return;
         }
@@ -232,7 +194,6 @@ impl PromptInjectionScanner {
                 content.push(b.to_string());
             }
             Value::Null => {
-                // Skip null values
             }
         }
     }

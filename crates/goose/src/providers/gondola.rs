@@ -5,7 +5,7 @@
 //! and inference tasks using BERT-based models. It provides access to Gondola's BatchInfer API
 //! for use cases like prompt injection detection.
 //!
-//! TODO: figure out if this is the right place for this. 
+//! TODO: figure out if this is the right place for this.
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -88,9 +88,9 @@ impl GondolaProvider {
     /// Invoke a Gondola model with batch inference
     ///
     /// # Arguments
-    /// * `model` - Model name 
+    /// * `model` - Model name
     /// * `version` - Model version
-    /// * `input_name` - Name of the input field 
+    /// * `input_name` - Name of the input field
     /// * `texts` - Array of text inputs to process
     ///
     /// # Returns
