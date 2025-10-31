@@ -1,3 +1,4 @@
+pub mod prompt_ml_detector;
 pub mod patterns;
 pub mod scanner;
 pub mod security_inspector;
@@ -40,6 +41,16 @@ impl SecurityManager {
             .unwrap_or(false)
     }
 
+    /// Check if ML-based scanning is enabled
+    fn is_ml_scanning_enabled(&self) -> bool {
+        use crate::config::Config;
+        let config = Config::global();
+
+        config
+            .get_param::<bool>("security_ml_enabled")
+            .unwrap_or(false)
+    }
+
     /// New method for tool inspection framework - works directly with tool requests
     pub async fn analyze_tool_requests(
         &self,
@@ -55,11 +66,34 @@ impl SecurityManager {
         }
 
         let scanner = self.scanner.get_or_init(|| {
-            tracing::info!(
-                gauge.goose.prompt_injection_scanner_enabled = 1,
-                "🔓 Security scanner initialized and enabled"
-            );
-            PromptInjectionScanner::new()
+            let ml_enabled = self.is_ml_scanning_enabled();
+            
+            let scanner = if ml_enabled {
+                match PromptInjectionScanner::with_ml_detection() {
+                    Ok(s) => {
+                        tracing::info!(
+                            gauge.goose.prompt_injection_scanner_enabled = 1,
+                            "🔓 Security scanner initialized with ML-based detection"
+                        );
+                        s
+                    }
+                    Err(e) => {
+                        tracing::warn!(
+                            "⚠️ ML scanning requested but failed to initialize: {}. Falling back to pattern-only scanning",
+                            e
+                        );
+                        PromptInjectionScanner::new()
+                    }
+                }
+            } else {
+                tracing::info!(
+                    gauge.goose.prompt_injection_scanner_enabled = 1,
+                    "🔓 Security scanner initialized with pattern-based detection only"
+                );
+                PromptInjectionScanner::new()
+            };
+            
+            scanner
         });
 
         let mut results = Vec::new();

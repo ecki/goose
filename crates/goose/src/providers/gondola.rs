@@ -88,9 +88,9 @@ impl GondolaProvider {
     /// Invoke a Gondola model with batch inference
     ///
     /// # Arguments
-    /// * `model` - Model name (e.g., "deberta-prompt-injection-v2")
-    /// * `version` - Model version (e.g., "gmv-zve9abhxe9s7fq1zep5dxd807")
-    /// * `input_name` - Name of the input field (e.g., "text_input")
+    /// * `model` - Model name 
+    /// * `version` - Model version
+    /// * `input_name` - Name of the input field 
     /// * `texts` - Array of text inputs to process
     ///
     /// # Returns

@@ -1,4 +1,5 @@
 use crate::conversation::message::Message;
+use crate::security::prompt_ml_detector::MlDetector;
 use crate::security::patterns::{PatternMatcher, RiskLevel};
 use anyhow::Result;
 use rmcp::model::CallToolRequestParam;
@@ -13,13 +14,24 @@ pub struct ScanResult {
 
 pub struct PromptInjectionScanner {
     pattern_matcher: PatternMatcher,
+    ml_detector: Option<MlDetector>,
 }
 
 impl PromptInjectionScanner {
     pub fn new() -> Self {
         Self {
             pattern_matcher: PatternMatcher::new(),
+            ml_detector: None,
         }
+    }
+
+    /// Create scanner with ML detection enabled
+    pub fn with_ml_detection() -> Result<Self> {
+        let ml_detector = MlDetector::from_env()?;
+        Ok(Self {
+            pattern_matcher: PatternMatcher::new(),
+            ml_detector: Some(ml_detector),
+        })
     }
 
     /// Get threshold from config
@@ -57,58 +69,109 @@ impl PromptInjectionScanner {
         self.scan_for_dangerous_patterns(text).await
     }
 
-    /// Core pattern matching logic
+    /// Core scanning logic - uses both pattern and ML detection
     pub async fn scan_for_dangerous_patterns(&self, text: &str) -> Result<ScanResult> {
+        // Run pattern-based detection
+        let pattern_confidence = self.scan_with_patterns(text);
+        
+        // Run ML-based detection if available
+        let ml_confidence = if let Some(ml_detector) = &self.ml_detector {
+            match ml_detector.scan(text).await {
+                Ok(conf) => Some(conf),
+                Err(e) => {
+                    tracing::warn!("ML scanning failed, using pattern-only: {:#}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
+        // Combine results
+        self.combine_results(text, pattern_confidence, ml_confidence)
+    }
+
+    /// Run pattern-based scanning and return confidence score
+    fn scan_with_patterns(&self, text: &str) -> f32 {
         let matches = self.pattern_matcher.scan_text(text);
 
         if matches.is_empty() {
-            return Ok(ScanResult {
-                is_malicious: false,
-                confidence: 0.0,
-                explanation: "No security threats detected".to_string(),
-            });
+            return 0.0;
         }
 
-        // Get the highest risk level
         let max_risk = self
             .pattern_matcher
             .get_max_risk_level(&matches)
             .unwrap_or(RiskLevel::Low);
 
-        let confidence = max_risk.confidence_score();
-        let is_malicious = confidence >= 0.5; // Threshold for considering something malicious
+        max_risk.confidence_score()
+    }
+
+    /// Combine pattern and ML results into final scan result
+    fn combine_results(
+        &self,
+        text: &str,
+        pattern_confidence: f32,
+        ml_confidence: Option<f32>,
+    ) -> Result<ScanResult> {
+        // Use the maximum confidence from either method
+        let confidence = match ml_confidence {
+            Some(ml_conf) => pattern_confidence.max(ml_conf),
+            None => pattern_confidence,
+        };
+
+        let is_malicious = confidence >= 0.5;
 
         // Build explanation
-        let mut explanations = Vec::new();
-        for (i, pattern_match) in matches.iter().take(3).enumerate() {
-            // Limit to top 3 matches
-            explanations.push(format!(
-                "{}. {} (Risk: {:?}) - Found: '{}'",
-                i + 1,
-                pattern_match.threat.description,
-                pattern_match.threat.risk_level,
-                pattern_match
-                    .matched_text
-                    .chars()
-                    .take(50)
-                    .collect::<String>()
-            ));
-        }
-
-        let explanation = if matches.len() > 3 {
-            format!(
-                "Detected {} security threats:\n{}\n... and {} more",
-                matches.len(),
-                explanations.join("\n"),
-                matches.len() - 3
-            )
+        let explanation = if confidence == 0.0 {
+            "No security threats detected".to_string()
         } else {
-            format!(
-                "Detected {} security threat{}:\n{}",
-                matches.len(),
-                if matches.len() == 1 { "" } else { "s" },
-                explanations.join("\n")
-            )
+            let mut parts = Vec::new();
+
+            // Pattern detection details
+            if pattern_confidence > 0.0 {
+                let matches = self.pattern_matcher.scan_text(text);
+                let mut pattern_details = Vec::new();
+                for (i, pattern_match) in matches.iter().take(3).enumerate() {
+                    pattern_details.push(format!(
+                        "{}. {} (Risk: {:?}) - Found: '{}'",
+                        i + 1,
+                        pattern_match.threat.description,
+                        pattern_match.threat.risk_level,
+                        pattern_match
+                            .matched_text
+                            .chars()
+                            .take(50)
+                            .collect::<String>()
+                    ));
+                }
+                
+                let pattern_summary = if matches.len() > 3 {
+                    format!(
+                        "Pattern-based detection (confidence: {:.2}):\n{}\n... and {} more",
+                        pattern_confidence,
+                        pattern_details.join("\n"),
+                        matches.len() - 3
+                    )
+                } else {
+                    format!(
+                        "Pattern-based detection (confidence: {:.2}):\n{}",
+                        pattern_confidence,
+                        pattern_details.join("\n")
+                    )
+                };
+                parts.push(pattern_summary);
+            }
+
+            // ML detection details
+            if let Some(ml_conf) = ml_confidence {
+                parts.push(format!(
+                    "ML-based detection (confidence: {:.2})",
+                    ml_conf
+                ));
+            }
+
+            parts.join("\n\n")
         };
 
         Ok(ScanResult {
