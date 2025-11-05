@@ -49,12 +49,18 @@ impl PromptInjectionScanner {
         tool_call: &CallToolRequestParam,
         _messages: &[Message],
     ) -> Result<ScanResult> {
+        let threshold = self.get_threshold_from_config();
         let tool_content = self.extract_tool_content(tool_call);
-        self.scan_for_dangerous_patterns(&tool_content).await
+        self.scan_for_dangerous_patterns(&tool_content, threshold)
+            .await
     }
 
     // TODO: see if we can combine this with the above
-    pub async fn scan_for_dangerous_patterns(&self, text: &str) -> Result<ScanResult> {
+    pub async fn scan_for_dangerous_patterns(
+        &self,
+        text: &str,
+        threshold: f32,
+    ) -> Result<ScanResult> {
         let pattern_confidence = self.scan_with_patterns(text);
 
         let ml_confidence = if let Some(ml_detector) = &self.ml_detector {
@@ -69,7 +75,7 @@ impl PromptInjectionScanner {
             None
         };
 
-        self.combine_results(text, pattern_confidence, ml_confidence)
+        self.combine_results(text, pattern_confidence, ml_confidence, threshold)
     }
     fn scan_with_patterns(&self, text: &str) -> f32 {
         let matches = self.pattern_matcher.scan_text(text);
@@ -91,58 +97,65 @@ impl PromptInjectionScanner {
         text: &str,
         pattern_confidence: f32,
         ml_confidence: Option<f32>,
+        threshold: f32,
     ) -> Result<ScanResult> {
         let confidence = match ml_confidence {
             Some(ml_conf) => pattern_confidence.max(ml_conf),
             None => pattern_confidence,
         };
 
-        let is_malicious = confidence >= 0.5;
+        let is_malicious = confidence >= threshold;
 
-        let explanation = if confidence == 0.0 {
+        let explanation = if !is_malicious {
             "No security threats detected".to_string()
         } else {
-            let mut parts = Vec::new();
-            if pattern_confidence > 0.0 {
-                let matches = self.pattern_matcher.scan_text(text);
-                let mut pattern_details = Vec::new();
-                for (i, pattern_match) in matches.iter().take(3).enumerate() {
-                    pattern_details.push(format!(
-                        "{}. {} (Risk: {:?}) - Found: '{}'",
-                        i + 1,
-                        pattern_match.threat.description,
-                        pattern_match.threat.risk_level,
-                        pattern_match
-                            .matched_text
-                            .chars()
-                            .take(50)
-                            .collect::<String>()
-                    ));
-                }
-
-                let pattern_summary = if matches.len() > 3 {
-                    format!(
-                        "Pattern-based detection (confidence: {:.2}):\n{}\n... and {} more",
-                        pattern_confidence,
-                        pattern_details.join("\n"),
-                        matches.len() - 3
-                    )
-                } else {
-                    format!(
-                        "Pattern-based detection (confidence: {:.2}):\n{}",
-                        pattern_confidence,
-                        pattern_details.join("\n")
-                    )
-                };
-                parts.push(pattern_summary);
-            }
-
-            if let Some(ml_conf) = ml_confidence {
-                parts.push(format!("ML-based detection (confidence: {:.2})", ml_conf));
-            }
-
-            parts.join("\n\n")
+            "Security threat found!".to_string()
         };
+
+        // let explanation = if confidence == 0.0 {
+        //     "No security threats detected".to_string()
+        // } else {
+        //     let mut parts = Vec::new();
+        //     if pattern_confidence > 0.0 {
+        //         let matches = self.pattern_matcher.scan_text(text);
+        //         let mut pattern_details = Vec::new();
+        //         for (i, pattern_match) in matches.iter().take(3).enumerate() {
+        //             pattern_details.push(format!(
+        //                 "{}. {} (Risk: {:?}) - Found: '{}'",
+        //                 i + 1,
+        //                 pattern_match.threat.description,
+        //                 pattern_match.threat.risk_level,
+        //                 pattern_match
+        //                     .matched_text
+        //                     .chars()
+        //                     .take(50)
+        //                     .collect::<String>()
+        //             ));
+        //         }
+
+        //         let pattern_summary = if matches.len() > 3 {
+        //             format!(
+        //                 "Pattern-based detection (confidence: {:.2}):\n{}\n... and {} more",
+        //                 pattern_confidence,
+        //                 pattern_details.join("\n"),
+        //                 matches.len() - 3
+        //             )
+        //         } else {
+        //             format!(
+        //                 "Pattern-based detection (confidence: {:.2}):\n{}",
+        //                 pattern_confidence,
+        //                 pattern_details.join("\n")
+        //             )
+        //         };
+        //         parts.push(pattern_summary);
+        //     }
+
+        //     if let Some(ml_conf) = ml_confidence {
+        //         parts.push(format!("ML-based detection (confidence: {:.2})", ml_conf));
+        //     }
+
+        //     parts.join("\n\n")
+        // };
 
         Ok(ScanResult {
             is_malicious,
@@ -193,8 +206,7 @@ impl PromptInjectionScanner {
             Value::Bool(b) => {
                 content.push(b.to_string());
             }
-            Value::Null => {
-            }
+            Value::Null => {}
         }
     }
 }
