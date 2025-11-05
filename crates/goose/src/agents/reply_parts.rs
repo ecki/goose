@@ -33,7 +33,10 @@ async fn toolshim_postprocess(
 }
 
 impl Agent {
-    pub async fn prepare_tools_and_prompt(&self) -> Result<(Vec<Tool>, Vec<Tool>, String)> {
+    pub async fn prepare_tools_and_prompt(
+        &self,
+        working_dir: &std::path::Path,
+    ) -> Result<(Vec<Tool>, Vec<Tool>, String)> {
         // Get router enabled status
         let router_enabled = self.tool_route_manager.is_router_enabled().await;
 
@@ -83,6 +86,30 @@ impl Agent {
             .with_extension_and_tool_counts(extension_count, tool_count)
             .with_router_enabled(router_enabled)
             .build();
+
+        // Load and append hints to system prompt
+        use crate::hints::load_hint_files;
+        use ignore::gitignore::GitignoreBuilder;
+
+        // Create a gitignore for the working directory
+        let gitignore = GitignoreBuilder::new(working_dir)
+            .build()
+            .unwrap_or_else(|_| {
+                // Fallback to empty gitignore if building fails
+                GitignoreBuilder::new(working_dir)
+                    .build()
+                    .expect("Failed to create fallback gitignore")
+            });
+
+        let hints = load_hint_files(
+            working_dir,
+            &[".goosehints".to_string(), "AGENTS.md".to_string()],
+            &gitignore,
+        );
+
+        if !hints.is_empty() {
+            system_prompt.push_str(&hints);
+        }
 
         // Handle toolshim if enabled
         let mut toolshim_tools = vec![];
@@ -382,7 +409,9 @@ mod tests {
             .await
             .unwrap();
 
-        let (tools, _toolshim_tools, _system_prompt) = agent.prepare_tools_and_prompt().await?;
+        let working_dir = std::env::current_dir()?;
+        let (tools, _toolshim_tools, _system_prompt) =
+            agent.prepare_tools_and_prompt(&working_dir).await?;
 
         // Ensure both platform and frontend tools are present
         let names: Vec<String> = tools.iter().map(|t| t.name.clone().into_owned()).collect();

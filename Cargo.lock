@@ -2632,6 +2632,7 @@ dependencies = [
  "etcetera",
  "fs2",
  "futures",
+ "ignore",
  "include_dir",
  "indexmap 2.12.0",
  "indoc",
