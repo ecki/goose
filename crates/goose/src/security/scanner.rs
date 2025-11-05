@@ -3,7 +3,6 @@ use crate::security::patterns::{PatternMatcher, RiskLevel};
 use crate::security::prompt_ml_detector::MlDetector;
 use anyhow::Result;
 use rmcp::model::CallToolRequestParam;
-use serde_json::Value;
 
 #[derive(Debug, Clone)]
 pub struct ScanResult {
@@ -104,58 +103,27 @@ impl PromptInjectionScanner {
             None => pattern_confidence,
         };
 
+        let threshold = self.get_threshold_from_config();
         let is_malicious = confidence >= threshold;
 
         let explanation = if !is_malicious {
             "No security threats detected".to_string()
         } else {
-            "Security threat found!".to_string()
+            if pattern_confidence >= threshold {
+                let matches = self.pattern_matcher.scan_text(text);
+                if let Some(top_match) = matches.first() {
+                    let preview = top_match.matched_text.chars().take(50).collect::<String>();
+                    format!(
+                        "Security threat: {} (Risk: {:?}) - Found: '{}'",
+                        top_match.threat.description, top_match.threat.risk_level, preview
+                    )
+                } else {
+                    "Security threat detected".to_string()
+                }
+            } else {
+                "Security threat detected".to_string()
+            }
         };
-
-        // let explanation = if confidence == 0.0 {
-        //     "No security threats detected".to_string()
-        // } else {
-        //     let mut parts = Vec::new();
-        //     if pattern_confidence > 0.0 {
-        //         let matches = self.pattern_matcher.scan_text(text);
-        //         let mut pattern_details = Vec::new();
-        //         for (i, pattern_match) in matches.iter().take(3).enumerate() {
-        //             pattern_details.push(format!(
-        //                 "{}. {} (Risk: {:?}) - Found: '{}'",
-        //                 i + 1,
-        //                 pattern_match.threat.description,
-        //                 pattern_match.threat.risk_level,
-        //                 pattern_match
-        //                     .matched_text
-        //                     .chars()
-        //                     .take(50)
-        //                     .collect::<String>()
-        //             ));
-        //         }
-
-        //         let pattern_summary = if matches.len() > 3 {
-        //             format!(
-        //                 "Pattern-based detection (confidence: {:.2}):\n{}\n... and {} more",
-        //                 pattern_confidence,
-        //                 pattern_details.join("\n"),
-        //                 matches.len() - 3
-        //             )
-        //         } else {
-        //             format!(
-        //                 "Pattern-based detection (confidence: {:.2}):\n{}",
-        //                 pattern_confidence,
-        //                 pattern_details.join("\n")
-        //             )
-        //         };
-        //         parts.push(pattern_summary);
-        //     }
-
-        //     if let Some(ml_conf) = ml_confidence {
-        //         parts.push(format!("ML-based detection (confidence: {:.2})", ml_conf));
-        //     }
-
-        //     parts.join("\n\n")
-        // };
 
         Ok(ScanResult {
             is_malicious,
@@ -165,49 +133,15 @@ impl PromptInjectionScanner {
     }
 
     fn extract_tool_content(&self, tool_call: &CallToolRequestParam) -> String {
-        let mut content = Vec::new();
-        content.push(format!("Tool: {}", tool_call.name));
-        self.extract_text_from_value(&Value::from(tool_call.arguments.clone()), &mut content, 0);
-        content.join("\n")
-    }
+        let mut parts = vec![format!("Tool: {}", tool_call.name)];
 
-    #[allow(clippy::only_used_in_recursion)]
-    fn extract_text_from_value(&self, value: &Value, content: &mut Vec<String>, depth: usize) {
-        if depth > 10 {
-            return;
+        if let Some(ref args) = tool_call.arguments {
+            if let Ok(json_str) = serde_json::to_string_pretty(args) {
+                parts.push(json_str);
+            }
         }
 
-        match value {
-            Value::String(s) => {
-                if !s.trim().is_empty() {
-                    content.push(s.clone());
-                }
-            }
-            Value::Array(arr) => {
-                for item in arr {
-                    self.extract_text_from_value(item, content, depth + 1);
-                }
-            }
-            Value::Object(obj) => {
-                for (key, val) in obj {
-                    // Include key names that might contain commands
-                    if matches!(
-                        key.as_str(),
-                        "command" | "script" | "code" | "shell" | "bash" | "cmd"
-                    ) {
-                        content.push(format!("{}: ", key));
-                    }
-                    self.extract_text_from_value(val, content, depth + 1);
-                }
-            }
-            Value::Number(n) => {
-                content.push(n.to_string());
-            }
-            Value::Bool(b) => {
-                content.push(b.to_string());
-            }
-            Value::Null => {}
-        }
+        parts.join("\n")
     }
 }
 
@@ -217,6 +151,7 @@ impl Default for PromptInjectionScanner {
     }
 }
 
+// TODO: review + update below
 #[cfg(test)]
 mod tests {
     use super::*;
