@@ -25,7 +25,7 @@ impl PromptInjectionScanner {
     }
 
     pub fn with_ml_detection() -> Result<Self> {
-        let ml_detector = MlDetector::from_env()?;
+        let ml_detector = MlDetector::new_from_config()?;
         Ok(Self {
             pattern_matcher: PatternMatcher::new(),
             ml_detector: Some(ml_detector),
@@ -43,6 +43,7 @@ impl PromptInjectionScanner {
         0.7
     }
 
+    // TODO: add context scanning (using messages)
     pub async fn analyze_tool_call_with_context(
         &self,
         tool_call: &CallToolRequestParam,
@@ -102,8 +103,6 @@ impl PromptInjectionScanner {
             Some(ml_conf) => pattern_confidence.max(ml_conf),
             None => pattern_confidence,
         };
-
-        let threshold = self.get_threshold_from_config();
         let is_malicious = confidence >= threshold;
 
         let explanation = if !is_malicious {

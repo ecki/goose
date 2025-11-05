@@ -17,7 +17,7 @@ pub struct ModelConfig {
 }
 
 impl ModelConfig {
-    /// Registry of available models with their full configurations
+    // TODO: check if this is the best way to keep this registry (maybe there's a better solution that doesn't hardcode)
     fn model_registry() -> HashMap<&'static str, (&'static str, &'static str)> {
         let mut registry = HashMap::new();
         registry.insert(
@@ -45,10 +45,10 @@ impl ModelConfig {
         })
     }
 
-    pub fn default() -> Self {
-        Self::from_model_name(DEFAULT_MODEL_NAME)
-            .expect("Default model should always be in registry")
-    }
+    // pub fn default() -> Self {
+    //     Self::from_model_name(DEFAULT_MODEL_NAME)
+    //         .expect("Default model should always be in registry")
+    // }
 
     pub fn from_config() -> Result<Self> {
         let config = crate::config::Config::global();
@@ -66,14 +66,15 @@ impl MlDetector {
         Self { provider, config }
     }
 
-    pub fn from_env() -> Result<Self> {
-        let provider = GondolaProvider::from_env()
-            .context("Failed to initialize Gondola provider for ML detection")?;
+    pub fn new_from_config() -> Result<Self> {
+        let provider = GondolaProvider::new().context("Failed to initialize Gondola provider")?;
 
         let config = ModelConfig::from_config().context("Failed to load ML model configuration")?;
+
         Ok(Self::new(provider, config))
     }
 
+    // TODO: truncation + whitespace elimination - see other PR commits
     pub async fn scan(&self, text: &str) -> Result<f32> {
         tracing::debug!(
             text_length = text.len(),

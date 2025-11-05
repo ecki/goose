@@ -55,12 +55,18 @@ pub struct DoubleListValue {
 }
 
 impl GondolaProvider {
-    /// Default Gondola endpoint (staging) - TODO: remove this - just for testing
-    pub const DEFAULT_ENDPOINT: &'static str =
-        "https://gondola-ski.stage.sqprod.co/services/squareup.gondola.service.ModelService/BatchInfer";
+    /// Default Gondola endpoint (staging) - TODO: remove this - just for testing - needs to be ENV var or similar
+    // pub const DEFAULT_ENDPOINT: &'static str =
+    //     "https://gondola-ski.stage.sqprod.co/services/squareup.gondola.service.ModelService/BatchInfer";
 
     pub fn new() -> Result<Self> {
-        Self::with_endpoint(Self::DEFAULT_ENDPOINT)
+        let config = crate::config::Config::global();
+
+        let endpoint = config
+            .get_param::<String>("gondola_endpoint")
+            .context("GONDOLA_ENDPOINT must be configured")?;
+
+        Self::with_endpoint(&endpoint)
     }
 
     pub fn with_endpoint(endpoint: &str) -> Result<Self> {
@@ -73,16 +79,6 @@ impl GondolaProvider {
             endpoint: endpoint.to_string(),
             client,
         })
-    }
-
-    pub fn from_env() -> Result<Self> {
-        let config = crate::config::Config::global();
-
-        let endpoint = config
-            .get_param::<String>("GONDOLA_ENDPOINT")
-            .unwrap_or_else(|_| Self::DEFAULT_ENDPOINT.to_string());
-
-        Self::with_endpoint(&endpoint)
     }
 
     /// Invoke a Gondola model with batch inference
